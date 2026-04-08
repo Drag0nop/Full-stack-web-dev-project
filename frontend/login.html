@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Autonomous Codebase Documenter</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body data-page="login">
+    <main class="shell auth-shell">
+      <section class="hero compact-hero">
+        <article class="card hero-copy">
+          <div class="eyebrow">Autonomous Codebase Documenter</div>
+          <h1>Sign in and inspect a codebase faster.</h1>
+          <p class="subtle">
+            Jump into generated architecture docs, repository Q&amp;A, and voice explanations without losing time on manual onboarding.
+          </p>
+        </article>
+        <form id="login-form" class="card auth-card">
+          <div class="eyebrow">Login</div>
+          <h2>Welcome back</h2>
+          <label>Email <input type="email" name="email" required /></label>
+          <label>Password <input type="password" name="password" required /></label>
+          <div class="button-row">
+            <button type="submit">Sign In</button>
+            <a class="button secondary-link" href="/register">Register</a>
+          </div>
+          <div id="auth-status" class="status"></div>
+          <p class="subtle auth-switch">New here? Use Register to create your account first.</p>
+        </form>
+      </section>
+    </main>
+    <script src="/assets/auth.js"></script>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home | Autonomous Codebase Documenter</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body data-page="home">
+    <main class="shell">
+      <section class="hero">
+        <article class="card hero-copy">
+          <div class="eyebrow">Autonomous Codebase Documenter</div>
+          <h1>Understand a repository in minutes.</h1>
+          <p class="subtle">
+            Upload a ZIP or pull from GitHub, generate structured documentation, inspect the tree, and ask follow-up questions with voice playback built in.
+          </p>
+          <div class="metric-grid">
+            <div class="metric">
+              <strong>&lt; 2 min</strong>
+              Small-repo docs target
+            </div>
+            <div class="metric">
+              <strong>ZIP or GitHub</strong>
+              Flexible ingestion paths
+            </div>
+            <div class="metric">
+              <strong>Voice ready</strong>
+              Browser speech APIs
+            </div>
+          </div>
+        </article>
+        <article class="card auth-card">
+          <div class="eyebrow">Session</div>
+          <h3 id="user-email">Signed in</h3>
+          <p class="subtle">JWT auth keeps project runs scoped to each user.</p>
+          <div class="button-row">
+            <button id="logout-button" class="secondary" type="button">Log Out</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="card upload-card">
+        <div class="eyebrow">Ingest Repository</div>
+        <h2>Add a project</h2>
+        <div class="ingest-grid">
+          <form id="upload-form" class="ingest-form">
+            <h3>Upload ZIP</h3>
+            <label>Project name <input type="text" name="name" required placeholder="My internal service" /></label>
+            <label>ZIP archive <input type="file" name="zip_file" accept=".zip" required /></label>
+            <button type="submit">Generate From ZIP</button>
+          </form>
+          <form id="github-form" class="ingest-form">
+            <h3>Import From GitHub</h3>
+            <label>Project name <input type="text" name="name" required placeholder="Open source repo" /></label>
+            <label>GitHub repo URL <input type="url" name="repo_url" required placeholder="https://github.com/owner/repo" /></label>
+            <button type="submit">Generate From GitHub</button>
+          </form>
+        </div>
+        <div id="upload-status" class="status"></div>
+      </section>
+
+      <section class="workspace">
+        <aside class="card projects-card">
+          <div class="eyebrow">Projects</div>
+          <h3 id="project-title">Choose a project</h3>
+          <p id="project-meta" class="subtle">Upload a ZIP or import a GitHub repository.</p>
+          <ul id="project-list" class="project-list"></ul>
+          <hr />
+          <div class="eyebrow">Tree</div>
+          <ul id="tree-root" class="tree-root"></ul>
+        </aside>
+
+        <section class="card viewer-card">
+          <div class="eyebrow">Documentation</div>
+          <h2 id="doc-title">Repository Overview</h2>
+          <p class="subtle">Select a file in the tree to inspect generated documentation.</p>
+          <div class="button-row">
+            <button id="speak-button" class="secondary" type="button">Speak Current View</button>
+          </div>
+          <div id="doc-body" class="doc-body"></div>
+        </section>
+
+        <aside class="card chat-card">
+          <div class="eyebrow">Interactive Q&amp;A</div>
+          <h2>Ask the repo</h2>
+          <p class="subtle">Use text or browser voice input for quick explanations.</p>
+          <div class="button-row">
+            <button id="voice-button" class="secondary" type="button">Ask By Voice</button>
+          </div>
+          <div id="chat-log" class="chat-log"></div>
+          <form id="chat-form">
+            <label>Your question <textarea id="chat-input" placeholder="What does this repository do?"></textarea></label>
+            <button type="submit">Send Question</button>
+          </form>
+        </aside>
+      </section>
+    </main>
+    <script src="/assets/home.js"></script>
+  </body>
+</html>
