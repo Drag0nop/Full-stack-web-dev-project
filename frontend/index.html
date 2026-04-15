@@ -1,11 +1,390 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content="0; url=/login" />
-    <title>Redirecting</title>
-  </head>
-  <body>
-    <p>Redirecting to <a href="/login">login</a>...</p>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Autonomous Codebase Documenter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow {
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .input-field {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .bg-grid {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+        }
+        .toast {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-950 text-white overflow-hidden">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 bg-grid"></div>
+    <div class="orb w-96 h-96 bg-violet-600 -top-48 -left-48"></div>
+    <div class="orb w-96 h-96 bg-pink-600 -bottom-48 -right-48"></div>
+    
+    <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 glass rounded-2xl mb-4 animate-float">
+                    <svg class="w-8 h-8 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold gradient-text">Autonomous Codebase Documenter</h1>
+                <p class="text-gray-400 mt-2">AI-powered documentation generation</p>
+            </div>
+            
+            <!-- Auth Form -->
+            <div class="glass rounded-3xl p-8 glow">
+                <div id="auth-form-container">
+                    <!-- Login Form -->
+                    <div id="login-form">
+                        <h2 class="text-2xl font-semibold mb-6">Welcome Back</h2>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                                <input type="email" id="login-email" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="you@example.com">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                                <div class="relative">
+                                    <input type="password" id="login-password" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="••••••••">
+                                    <button type="button" onclick="togglePassword('login-password')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                                        <svg id="login-eye" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between text-sm">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="remember-me" class="w-4 h-4 rounded border-gray-600 bg-gray-800 text-violet-600">
+                                    <span class="ml-2 text-gray-300">Remember me</span>
+                                </label>
+                                <a href="#" onclick="showForgotPassword()" class="text-violet-400 hover:text-violet-300">Forgot password?</a>
+                            </div>
+                            
+                            <button onclick="handleLogin()" id="login-btn" class="btn-primary w-full py-3 rounded-xl font-semibold text-white">
+                                <span id="login-btn-text">Sign In</span>
+                                <div id="login-spinner" class="spinner hidden mx-auto"></div>
+                            </button>
+                        </div>
+                        
+                        <div class="mt-6 text-center">
+                            <p class="text-gray-400">
+                                Don't have an account? 
+                                <button onclick="showRegister()" class="text-violet-400 hover:text-violet-300 font-medium">Register</button>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Register Form -->
+                    <div id="register-form" class="hidden">
+                        <h2 class="text-2xl font-semibold mb-6">Create Account</h2>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                                <input type="text" id="register-name" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="John Doe">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                                <input type="email" id="register-email" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="you@example.com">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                                <div class="relative">
+                                    <input type="password" id="register-password" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="••••••••">
+                                    <button type="button" onclick="togglePassword('register-password')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                                        <svg id="register-eye" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button onclick="handleRegister()" id="register-btn" class="btn-primary w-full py-3 rounded-xl font-semibold text-white">
+                                <span id="register-btn-text">Create Account</span>
+                                <div id="register-spinner" class="spinner hidden mx-auto"></div>
+                            </button>
+                        </div>
+                        
+                        <div class="mt-6 text-center">
+                            <p class="text-gray-400">
+                                Already have an account? 
+                                <button onclick="showLogin()" class="text-violet-400 hover:text-violet-300 font-medium">Sign In</button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Demo Credentials -->
+            <div class="mt-6 text-center">
+                <p class="text-gray-500 text-sm">
+                    Demo: <span class="text-gray-300">demo@mail.com</span> / <span class="text-gray-300">password</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 hidden toast"></div>
+    
+    <!-- Forgot Password Modal -->
+    <div id="forgot-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="hideForgotPassword()"></div>
+        <div class="relative glass rounded-3xl p-8 max-w-md w-full glow">
+            <h2 class="text-2xl font-semibold mb-4">Forgot Password</h2>
+            <p class="text-gray-400 mb-6">Enter your email and we'll send you a password reset link.</p>
+            <input type="email" id="forgot-email" class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 mb-4" placeholder="you@example.com">
+            <div class="flex gap-3">
+                <button onclick="hideForgotPassword()" class="flex-1 py-3 rounded-xl border border-gray-600 hover:border-gray-500">Cancel</button>
+                <button onclick="handleForgotPassword()" id="forgot-btn" class="flex-1 btn-primary py-3 rounded-xl font-semibold">Send Link</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000/api';
+        
+        // Check if already logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                window.location.href = '/dashboard.html';
+            }
+        });
+        
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const eye = document.getElementById(fieldId.replace('password', 'eye'));
+            if (field.type === 'password') {
+                field.type = 'text';
+                eye.style.opacity = '0.5';
+            } else {
+                field.type = 'password';
+                eye.style.opacity = '1';
+            }
+        }
+        
+        function showRegister() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+        }
+        
+        function showLogin() {
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+        }
+        
+        function showForgotPassword() {
+            document.getElementById('forgot-modal').classList.remove('hidden');
+            document.getElementById('forgot-modal').classList.add('flex');
+        }
+        
+        function hideForgotPassword() {
+            document.getElementById('forgot-modal').classList.add('hidden');
+            document.getElementById('forgot-modal').classList.remove('flex');
+            document.getElementById('forgot-email').value = '';
+        }
+        
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `fixed top-4 right-4 toast px-6 py-4 rounded-xl shadow-lg ${
+                type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            }`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 4000);
+        }
+        
+        function setLoading(btnId, spinnerId, textId, loading) {
+            const btn = document.getElementById(btnId);
+            const spinner = document.getElementById(spinnerId);
+            const text = document.getElementById(textId);
+            btn.disabled = loading;
+            spinner.classList.toggle('hidden', !loading);
+            text.classList.toggle('hidden', loading);
+        }
+        
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showToast('Please fill in all fields');
+                return;
+            }
+            
+            setLoading('login-btn', 'login-spinner', 'login-btn-text', true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Login failed');
+                }
+                
+                localStorage.setItem('token', data.access_token);
+                showToast('Login successful!', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 500);
+            } catch (error) {
+                showToast(error.message);
+            } finally {
+                setLoading('login-btn', 'login-spinner', 'login-btn-text', false);
+            }
+        }
+        
+        async function handleRegister() {
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            
+            if (!name || !email || !password) {
+                showToast('Please fill in all fields');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters');
+                return;
+            }
+            
+            setLoading('register-btn', 'register-spinner', 'register-btn-text', true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Registration failed');
+                }
+                
+                showToast('Registration successful! Logging in...', 'success');
+                // Auto login after register
+                const loginRes = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const loginData = await loginRes.json();
+                
+                localStorage.setItem('token', loginData.access_token);
+                
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 500);
+            } catch (error) {
+                showToast(error.message);
+            } finally {
+                setLoading('register-btn', 'register-spinner', 'register-btn-text', false);
+            }
+        }
+        
+        async function handleForgotPassword() {
+            showToast('Feature not implemented yet');
+        }
+    </script>
+</body>
 </html>

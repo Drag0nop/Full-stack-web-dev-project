@@ -1,0 +1,43 @@
+autonomous-codebase-documenter/
+│
+├── backend/
+│    │
+│    ├── app/
+│    │   │
+│    │   ├── main.py                     # FastAPI entry point
+│    │   │
+│    │   ├── core/
+│    │   │   ├── config.py               # Environment config
+│    │   │   └── security.py             # JWT + password hashing
+│    │   │
+│    │   ├── database/
+│    │   │   └── mongodb.py              # MongoDB connection
+│    │   │
+│    │   ├── models/
+│    │   │   ├── user.py                 # User model
+│    │   │   └── analysis.py             # Analysis model
+│    │   │
+│    │   ├── routes/
+│    │   │   ├── auth.py                 # Register/Login (JWT)
+│    │   │   └── analysis.py             # Code analysis (all modes)
+│    │   │
+│    │   ├── services/
+│    │   │   ├── auth_service.py         # Auth logic
+│    │   │   ├── ai_service.py           # Gemini + chunking logic
+│    │   │   └── analysis_service.py     # DB storage & history
+│    │   │
+│    │   └── utils/                      # (optional, future use)
+│    │
+│    │
+│    ├── requirements.txt
+│    ├── .env
+│    └── run.py                  # Entry for production
+│
+├── frontend/
+│   ├── index.html
+│   ├── dashboard.html
+│   ├── css/
+│   └── js/
+│
+├── .gitignore
+└── README.md

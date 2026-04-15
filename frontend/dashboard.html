@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Autonomous Codebase Documenter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow {
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .bg-grid {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+        }
+        .input-field {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-completed { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .status-processing { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .status-failed { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .status-pending { background: rgba(156, 163, 175, 0.2); color: #9ca3af; }
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .drop-zone.dragover {
+            border-color: #a78bfa;
+            background: rgba(167, 139, 250, 0.1);
+        }
+        .toast {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .modal {
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-950 text-white">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 bg-grid"></div>
+    <div class="orb w-96 h-96 bg-violet-600 -top-48 -left-48"></div>
+    <div class="orb w-96 h-96 bg-pink-600 -bottom-48 -right-48"></div>
+    
+    <!-- Navbar -->
+    <nav class="relative z-20 glass border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 glass rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">Codebase Documenter</span>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <button class="relative p-2 hover:bg-white/5 rounded-lg transition">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full pulse-dot"></span>
+                    </button>
+                    
+                    <div class="relative" id="user-menu">
+                        <button onclick="toggleUserMenu()" class="flex items-center gap-2 p-2 hover:bg-white/5 rounded-lg transition">
+                            <div class="w-8 h-8 glass rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-violet-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span id="user-name" class="hidden sm:block text-sm">User</span>
+                        </button>
+                        <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 glass rounded-xl shadow-xl z-50">
+                            <a href="#" onclick="showProfile()" class="block px-4 py-3 hover:bg-white/5 text-sm">Profile</a>
+                            <a href="#" onclick="showSettings()" class="block px-4 py-3 hover:bg-white/5 text-sm">Settings</a>
+                            <hr class="border-gray-700">
+                            <a href="#" onclick="handleLogout()" class="block px-4 py-3 hover:bg-white/5 text-sm text-red-400">Sign out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Left Column - Input -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- GitHub Input -->
+                <div class="glass rounded-3xl p-6 glow">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-violet-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub Repository
+                    </h2>
+                    
+                    <div class="flex gap-3 mb-4">
+                        <input type="text" id="github-url" class="input-field flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="https://github.com/owner/repo">
+                        <button onclick="analyzeGithub()" id="analyze-btn" class="btn-primary px-6 py-3 rounded-xl font-semibold whitespace-nowrap">
+                            <span id="analyze-btn-text">Analyze</span>
+                            <div id="analyze-spinner" class="spinner hidden mx-auto"></div>
+                        </button>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-sm text-gray-400">Try:</span>
+                        <button onclick="setGithubUrl('https://github.com/facebook/react')" class="text-xs px-3 py-1 glass rounded-full hover:bg-white/10">react</button>
+                        <button onclick="setGithubUrl('https://github.com/tailwindlabs/tailwindcss')" class="text-xs px-3 py-1 glass rounded-full hover:bg-white/10">tailwindcss</button>
+                        <button onclick="setGithubUrl('https://github.com/nextjs/next')" class="text-xs px-3 py-1 glass rounded-full hover:bg-white/10">next.js</button>
+                    </div>
+                </div>
+                
+                <!-- File Upload -->
+                <div class="glass rounded-3xl p-6 glow">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        Upload Codebase
+                    </h2>
+                    
+                    <div id="drop-zone" class="drop-zone rounded-2xl p-8 text-center cursor-pointer">
+                        <input type="file" id="file-input" class="hidden" accept=".zip,.tar.gz,.tgz,.tar">
+                        <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        <p class="text-gray-400 mb-2">Drag & drop your codebase here</p>
+                        <p class="text-sm text-gray-500 mb-4">or click to browse (ZIP, TAR.GZ)</p>
+                        <button onclick="document.getElementById('file-input').click()" class="btn-primary px-6 py-2 rounded-xl text-sm">Browse Files</button>
+                    </div>
+                    
+                    <div id="file-preview" class="hidden mt-4 glass rounded-xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-8 h-8 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <div>
+                                    <p id="file-name" class="font-medium">file.zip</p>
+                                    <p id="file-size" class="text-sm text-gray-400">0 MB</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="analyzeFile()" id="upload-btn" class="btn-primary px-4 py-2 rounded-xl text-sm">
+                                    <span id="upload-btn-text">Upload & Analyze</span>
+                                    <div id="upload-spinner" class="spinner hidden mx-auto"></div>
+                                </button>
+                                <button onclick="clearFile()" class="p-2 hover:bg-white/5 rounded-lg">
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Stats & History -->
+            <div class="space-y-6">
+                <!-- Stats -->
+                <div class="glass rounded-3xl p-6 glow">
+                    <h3 class="text-lg font-semibold mb-4">Your Stats</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="glass rounded-xl p-4 text-center">
+                            <p id="total-count" class="text-3xl font-bold gradient-text">0</p>
+                            <p class="text-sm text-gray-400">Total</p>
+                        </div>
+                        <div class="glass rounded-xl p-4 text-center">
+                            <p id="completed-count" class="text-3xl font-bold text-green-400">0</p>
+                            <p class="text-sm text-gray-400">Completed</p>
+                        </div>
+                        <div class="glass rounded-xl p-4 text-center">
+                            <p id="processing-count" class="text-3xl font-bold text-blue-400">0</p>
+                            <p class="text-sm text-gray-400">In Progress</p>
+                        </div>
+                        <div class="glass rounded-xl p-4 text-center">
+                            <p id="failed-count" class="text-3xl font-bold text-red-400">0</p>
+                            <p class="text-sm text-gray-400">Failed</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- History -->
+                <div class="glass rounded-3xl p-6 glow">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Recent History</h3>
+                        <button onclick="loadHistory()" class="text-sm text-violet-400 hover:text-violet-300">Refresh</button>
+                    </div>
+                    <div id="history-list" class="space-y-3">
+                        <p class="text-gray-400 text-sm text-center py-8">No analyses yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Progress Modal -->
+    <div id="progress-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="relative glass rounded-3xl p-8 max-w-md w-full glow modal">
+            <div class="text-center">
+                <div class="spinner mx-auto mb-4"></div>
+                <h3 class="text-xl font-semibold mb-2">Analyzing...</h3>
+                <p id="progress-text" class="text-gray-400 mb-4">Processing your codebase</p>
+                <div class="glass rounded-full h-2 overflow-hidden">
+                    <div id="progress-fill" class="progress-bar h-full bg-gradient-to-r from-violet-500 to-pink-500" style="width: 0%"></div>
+                </div>
+                <p id="progress-percent" class="text-sm text-gray-400 mt-2">0%</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- README Preview Modal -->
+    <div id="readme-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeReadmeModal()"></div>
+        <div class="relative glass rounded-3xl p-8 max-w-4xl w-full glow modal max-h-[80vh] flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold">Generated README</h3>
+                <div class="flex gap-2">
+                    <button onclick="downloadReadme()" class="p-2 hover:bg-white/5 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                    </button>
+                    <button onclick="closeReadmeModal()" class="p-2 hover:bg-white/5 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="readme-content" class="glass rounded-xl p-6 overflow-auto flex-1 text-sm whitespace-pre-wrap"></div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 z-50 hidden toast"></div>
+    
+    <script>
+const API_BASE = 'http://127.0.0.1:8000/api';
+let currentReadme = '';
+let refreshInterval = null;
+
+// Auth check
+window.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/index.html';
+    } else {
+        refreshInterval = setInterval(loadHistory, 5000);
+    }
+});
+
+// User menu
+function toggleUserMenu() {
+    document.getElementById('user-dropdown').classList.toggle('hidden');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('#user-menu')) {
+        document.getElementById('user-dropdown').classList.add('hidden');
+    }
+});
+
+// 🔥 Helper to safely extract analysis text
+function extractAnalysis(data) {
+    return data?.analysis?.analysis || data?.analysis || data?.final_analysis || "No result";
+}
+
+// Load history
+async function loadHistory() {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE}/analysis/history?limit=10`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load history');
+
+        const data = await response.json();
+        const historyList = document.getElementById('history-list');
+
+        if (!data.analyses || data.analyses.length === 0) {
+            historyList.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">No analyses yet</p>';
+            return;
+        }
+
+        historyList.innerHTML = data.analyses.map((item) => `
+            <div class="glass rounded-xl p-4">
+                <div class="flex items-start justify-between mb-2">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium truncate">Code Analysis</p>
+                        <p class="text-xs text-gray-400">
+                            ${new Date(item.created_at).toLocaleDateString()}
+                        </p>
+                    </div>
+                    <span class="status-badge status-completed">DONE</span>
+                </div>
+
+                <button 
+                    class="view-btn text-xs px-3 py-1 glass rounded-full hover:bg-white/10"
+                    data-result="${encodeURIComponent(JSON.stringify(item.result))}">
+                    View Result
+                </button>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                try {
+                    const result = JSON.parse(decodeURIComponent(btn.dataset.result));
+                    viewResult(result);
+                } catch (e) {
+                    console.error("Parse error:", e);
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Error loading history:', error);
+    }
+}
+
+// Set GitHub URL
+function setGithubUrl(url) {
+    document.getElementById('github-url').value = url;
+}
+
+// Loading states
+function showLoading(btnId, spinnerId, textId) {
+    document.getElementById(btnId).disabled = true;
+    document.getElementById(spinnerId).classList.remove('hidden');
+    document.getElementById(textId).classList.add('hidden');
+}
+
+function hideLoading(btnId, spinnerId, textId) {
+    document.getElementById(btnId).disabled = false;
+    document.getElementById(spinnerId).classList.add('hidden');
+    document.getElementById(textId).classList.remove('hidden');
+}
+
+// 🔥 Analyze GitHub (FIXED)
+async function analyzeGithub() {
+    const url = document.getElementById('github-url').value.trim();
+    if (!url) {
+        showToast('Please enter a GitHub URL');
+        return;
+    }
+
+    showLoading('analyze-btn', 'analyze-spinner', 'analyze-btn-text');
+    showProgressModal();
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE}/analysis/github`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ repo_url: url })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Analysis failed');
+
+        currentReadme = extractAnalysis(data);
+
+        document.getElementById('readme-content').textContent = currentReadme;
+        document.getElementById('readme-modal').classList.remove('hidden');
+        document.getElementById('readme-modal').classList.add('flex');
+
+        showToast('Analysis completed!', 'success');
+        loadHistory();
+
+    } catch (error) {
+        showToast(error.message);
+    } finally {
+        hideProgressModal();
+        hideLoading('analyze-btn', 'analyze-spinner', 'analyze-btn-text');
+    }
+}
+
+// 🔥 Analyze File (FIXED)
+async function analyzeFile() {
+    const file = document.getElementById('file-input').files[0];
+    if (!file) {
+        showToast('Please select a file first');
+        return;
+    }
+
+    showLoading('upload-btn', 'upload-spinner', 'upload-btn-text');
+    showProgressModal();
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE}/analysis/upload`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Upload failed');
+
+        currentReadme = extractAnalysis(data);
+
+        document.getElementById('readme-content').textContent = currentReadme;
+        document.getElementById('readme-modal').classList.remove('hidden');
+        document.getElementById('readme-modal').classList.add('flex');
+
+        showToast('Analysis completed!', 'success');
+        loadHistory();
+
+    } catch (error) {
+        showToast(error.message);
+    } finally {
+        hideProgressModal();
+        hideLoading('upload-btn', 'upload-spinner', 'upload-btn-text');
+    }
+}
+
+// 🔥 View history result (FIXED)
+function viewResult(result) {
+    const content = result?.analysis?.analysis || result?.analysis || JSON.stringify(result, null, 2);
+
+    currentReadme = content;
+
+    document.getElementById('readme-content').textContent = content;
+    document.getElementById('readme-modal').classList.remove('hidden');
+    document.getElementById('readme-modal').classList.add('flex');
+}
+
+// UI helpers
+function showProgressModal() {
+    document.getElementById('progress-modal').classList.remove('hidden');
+    document.getElementById('progress-modal').classList.add('flex');
+}
+
+function hideProgressModal() {
+    document.getElementById('progress-modal').classList.add('hidden');
+    document.getElementById('progress-modal').classList.remove('flex');
+}
+
+function closeReadmeModal() {
+    document.getElementById('readme-modal').classList.add('hidden');
+    document.getElementById('readme-modal').classList.remove('flex');
+}
+
+function downloadReadme() {
+    const blob = new Blob([currentReadme], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'README.md';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function showToast(message, type = 'error') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `fixed top-4 right-4 z-50 toast px-6 py-4 rounded-xl ${
+        type === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 4000);
+}
+
+function handleLogout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/index.html';
+}
+</script>
+</body>
+</html>
