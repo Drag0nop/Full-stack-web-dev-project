@@ -4,6 +4,7 @@ AI-powered documentation generator that can generate README files from codebases
 
 ## Features
 
+<<<<<<< HEAD
 - Secure login and role-based admin access
 - Generate README files from public GitHub repositories
 - Upload ZIP codebases and generate README files from them
@@ -11,6 +12,14 @@ AI-powered documentation generator that can generate README files from codebases
 - Paginated user history with action-type labels
 - User stats for total actions, README generations, README summaries, and failures
 - Admin search, user list view, and per-user usage analytics
+=======
+- 🔐 **User Authentication** - Secure login/register with JWT tokens
+- 📁 **GitHub Analysis** - Analyze any public GitHub repository
+- 📤 **File Upload** - Upload ZIP/TAR.GZ codebases for analysis
+- 🤖 **AI-Powered** - Generates professional README files using Gemini AI
+- 📊 **History Tracking** - View all your past analyses
+- 📈 **Statistics** - Track completed, and failed analyses
+>>>>>>> aba8a7f827d7d6cd7202132daaaaf78eae19cfe8
 
 ## Tech Stack
 
@@ -34,6 +43,7 @@ AI-powered documentation generator that can generate README files from codebases
 
 ```text
 .
+<<<<<<< HEAD
 |-- backend/
 |   |-- app/
 |   |   |-- main.py
@@ -49,6 +59,26 @@ AI-powered documentation generator that can generate README files from codebases
 |   |-- dashboard.html
 |   `-- admin.html
 `-- README.md
+=======
+├── backend/
+│   ├── main.py              # FastAPI application entry point
+│   ├── database.py          # MongoDB connection management
+│   ├── models.py            # Pydantic data models
+│   ├── ai_agent.py          # Gemini AI agent for README generation
+│   ├── routes/
+│   │   ├── auth.py          # Authentication endpoints
+│   │   └── analysis.py      # Analysis endpoints
+│   ├── uploads/             # Temporary file storage
+│   ├── requirements.txt     # Python dependencies
+│   └── .env.example         # Environment variables template
+│
+├── frontend/
+│   ├── index.html           # Login/Register page
+│   ├── dashboard.html       # Main dashboard
+│   └── admin.html
+│
+└── README.md                # This file
+>>>>>>> aba8a7f827d7d6cd7202132daaaaf78eae19cfe8
 ```
 
 ## Setup
@@ -56,8 +86,14 @@ AI-powered documentation generator that can generate README files from codebases
 ### Prerequisites
 
 - Python 3.9+
+<<<<<<< HEAD
 - MongoDB local or Atlas
 - A valid Gemini API key
+=======
+- MongoDB (local or Atlas)
+- HTML/CSS/JS
+- Google Gemini API Key
+>>>>>>> aba8a7f827d7d6cd7202132daaaaf78eae19cfe8
 
 ### Backend
 
@@ -183,4 +219,22 @@ Generated output typically includes:
 
 ## License
 
+<<<<<<< HEAD
 MIT
+=======
+This project is open source and available under the MIT License.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## Support
+
+For issues and questions, please open an issue on GitHub.
+
+---
+>>>>>>> aba8a7f827d7d6cd7202132daaaaf78eae19cfe8
