@@ -11,15 +11,6 @@ AI-powered documentation generator that can generate README files from codebases
 - User stats for total actions, README generations, README summaries, and failures
 - Admin search, user list view, and per-user usage analytics
 
-=======
-
-- 🔐 **User Authentication** - Secure login/register with JWT tokens
-- 📁 **GitHub Analysis** - Analyze any public GitHub repository
-- 📤 **File Upload** - Upload ZIP/TAR.GZ codebases for analysis
-- 🤖 **AI-Powered** - Generates professional README files using Gemini AI
-- 📊 **History Tracking** - View all your past analyses
-- 📈 **Statistics** - Track completed, and failed analyses
-
 ## Tech Stack
 
 ### Backend
