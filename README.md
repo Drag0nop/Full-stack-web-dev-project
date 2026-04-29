@@ -9,7 +9,7 @@ AI-powered documentation generator that automatically creates comprehensive READ
 - 📤 **File Upload** - Upload ZIP/TAR.GZ codebases for analysis
 - 🤖 **AI-Powered** - Generates professional README files using Gemini AI
 - 📊 **History Tracking** - View all your past analyses
-- 📈 **Statistics** - Track completed, in-progress, and failed analyses
+- 📈 **Statistics** - Track completed, and failed analyses
 
 ## Tech Stack
 
@@ -45,7 +45,8 @@ AI-powered documentation generator that automatically creates comprehensive READ
 │
 ├── frontend/
 │   ├── index.html           # Login/Register page
-│   └── dashboard.html       # Main dashboard
+│   ├── dashboard.html       # Main dashboard
+│   └── admin.html
 │
 └── README.md                # This file
 ```
@@ -56,7 +57,7 @@ AI-powered documentation generator that automatically creates comprehensive READ
 
 - Python 3.9+
 - MongoDB (local or Atlas)
-- Node.js (optional, for Tailwind CDN)
+- HTML/CSS/JS
 - Google Gemini API Key
 
 ### 1. Clone the Repository
@@ -248,13 +249,4 @@ This project is open source and available under the MIT License.
 
 For issues and questions, please open an issue on GitHub.
 
-## Recent Updates
-
-- History now uses pagination with 5 analyses per page.
-- A default admin account is created on startup: `admin@example.com` / `admin123`.
-- Admin users can open `/admin.html` to view the total user count and registered user details.
-- The dashboard includes a README Intelligence option that summarizes a GitHub repository README and suggests future improvements.
-
 ---
-
-Built with ❤️ using FastAPI, MongoDB, and Google Gemini AI
