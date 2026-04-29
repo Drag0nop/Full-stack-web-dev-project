@@ -134,13 +134,6 @@
                 </div>
                 
                 <div class="flex items-center gap-4">
-                    <button class="relative p-2 hover:bg-white/5 rounded-lg transition">
-                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
-                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full pulse-dot"></span>
-                    </button>
-                    
                     <div class="relative" id="user-menu">
                         <button onclick="toggleUserMenu()" class="flex items-center gap-2 p-2 hover:bg-white/5 rounded-lg transition">
                             <div class="w-8 h-8 glass rounded-full flex items-center justify-center">
@@ -150,14 +143,12 @@
                             </div>
                             <span id="user-name" class="hidden sm:block text-sm">User</span>
                         </button>
-                        <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 glass rounded-xl shadow-xl z-50">
-                            <a href="#" onclick="showProfile()" class="block px-4 py-3 hover:bg-white/5 text-sm">Profile</a>
-                            <a href="#" onclick="showSettings()" class="block px-4 py-3 hover:bg-white/5 text-sm">Settings</a>
-                            <hr class="border-gray-700">
+                        <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-40 glass rounded-xl shadow-xl z-50">
                             <a href="#" onclick="handleLogout()" class="block px-4 py-3 hover:bg-white/5 text-sm text-red-400">Sign out</a>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </nav>
@@ -173,13 +164,13 @@
                         <svg class="w-6 h-6 text-violet-400" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                         </svg>
-                        GitHub Repository
+                        Generate README (From Repo Code)
                     </h2>
                     
                     <div class="flex gap-3 mb-4">
                         <input type="text" id="github-url" class="input-field flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="https://github.com/owner/repo">
                         <button onclick="analyzeGithub()" id="analyze-btn" class="btn-primary px-6 py-3 rounded-xl font-semibold whitespace-nowrap">
-                            <span id="analyze-btn-text">Analyze</span>
+                            <span id="analyze-btn-text">Generate README</span>
                             <div id="analyze-spinner" class="spinner hidden mx-auto"></div>
                         </button>
                     </div>
@@ -191,7 +182,7 @@
                         <button onclick="setGithubUrl('https://github.com/nextjs/next')" class="text-xs px-3 py-1 glass rounded-full hover:bg-white/10">next.js</button>
                     </div>
                 </div>
-                
+
                 <!-- File Upload -->
                 <div class="glass rounded-3xl p-6 glow">
                     <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -236,6 +227,44 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="flex items-center gap-4 py-1">
+                    <div class="h-px flex-1 bg-gradient-to-r from-transparent via-white/15 to-white/10"></div>
+                    <span class="text-xs font-semibold tracking-[0.45em] text-gray-500">OR</span>
+                    <div class="h-px flex-1 bg-gradient-to-r from-white/10 via-white/15 to-transparent"></div>
+                </div>
+
+                <div class="glass rounded-3xl p-6 glow">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-semibold">Read Existing README</h2>
+                            <p class="text-sm text-gray-400 mt-1">Fetch repository README, summarize it, and suggest future improvements.</p>
+                        </div>
+                        <button id="readme-toggle-btn" onclick="toggleReadmeSummary()" class="btn-primary px-5 py-3 rounded-xl font-semibold whitespace-nowrap">
+                            Open
+                        </button>
+                    </div>
+                </div>
+
+                <div id="readme-summary-card" class="hidden glass rounded-3xl p-6 glow">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                        Existing README Insights
+                    </h2>
+                    <div class="flex gap-3">
+                        <input type="text" id="readme-github-url" class="input-field flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-500" placeholder="https://github.com/owner/repo">
+                        <button onclick="summarizeReadme()" id="readme-summary-btn" class="btn-primary px-6 py-3 rounded-xl font-semibold whitespace-nowrap">
+                            <span id="readme-summary-btn-text">Summarize</span>
+                            <div id="readme-summary-spinner" class="spinner hidden mx-auto"></div>
+                        </button>
+                    </div>
+                    <div id="readme-summary-result" class="hidden mt-4 glass rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-violet-300 mb-2">README Insights</h3>
+                        <pre id="readme-summary-content" class="text-sm whitespace-pre-wrap text-gray-200"></pre>
+                    </div>
+                </div>
             </div>
             
             <!-- Right Column - Stats & History -->
@@ -249,12 +278,12 @@
                             <p class="text-sm text-gray-400">Total</p>
                         </div>
                         <div class="glass rounded-xl p-4 text-center">
-                            <p id="completed-count" class="text-3xl font-bold text-green-400">0</p>
-                            <p class="text-sm text-gray-400">Completed</p>
+                            <p id="generate-count" class="text-3xl font-bold text-green-400">0</p>
+                            <p class="text-sm text-gray-400">Generate README</p>
                         </div>
                         <div class="glass rounded-xl p-4 text-center">
-                            <p id="processing-count" class="text-3xl font-bold text-blue-400">0</p>
-                            <p class="text-sm text-gray-400">In Progress</p>
+                            <p id="summary-count" class="text-3xl font-bold text-blue-400">0</p>
+                            <p class="text-sm text-gray-400">README Summary</p>
                         </div>
                         <div class="glass rounded-xl p-4 text-center">
                             <p id="failed-count" class="text-3xl font-bold text-red-400">0</p>
@@ -271,6 +300,11 @@
                     </div>
                     <div id="history-list" class="space-y-3">
                         <p class="text-gray-400 text-sm text-center py-8">No analyses yet</p>
+                    </div>
+                    <div id="history-pagination" class="hidden mt-4 flex items-center justify-between gap-3 text-sm">
+                        <button onclick="changeHistoryPage(-1)" id="history-prev" class="px-3 py-2 glass rounded-lg hover:bg-white/10">Previous</button>
+                        <span id="history-page-label" class="text-gray-400">Page 1 of 1</span>
+                        <button onclick="changeHistoryPage(1)" id="history-next" class="px-3 py-2 glass rounded-lg hover:bg-white/10">Next</button>
                     </div>
                 </div>
             </div>
@@ -323,6 +357,20 @@
 const API_BASE = 'http://127.0.0.1:8000/api';
 let currentReadme = '';
 let refreshInterval = null;
+let currentHistoryPage = 1;
+let totalHistoryPages = 1;
+
+function parseTokenPayload(token) {
+    try {
+        const payloadBase64 = token.split('.')[1];
+        if (!payloadBase64) return null;
+        const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+        const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+        return JSON.parse(atob(padded));
+    } catch (error) {
+        return null;
+    }
+}
 
 // Auth check
 window.addEventListener('DOMContentLoaded', () => {
@@ -330,7 +378,13 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!token) {
         window.location.href = '/index.html';
     } else {
-        refreshInterval = setInterval(loadHistory, 5000);
+        const payload = parseTokenPayload(token);
+        if (payload?.role === 'admin') {
+            window.location.href = '/admin.html';
+            return;
+        }
+        loadHistory();
+        refreshInterval = setInterval(() => loadHistory(currentHistoryPage), 5000);
     }
 });
 
@@ -351,11 +405,36 @@ function extractAnalysis(data) {
     return data?.analysis?.analysis || data?.analysis || data?.final_analysis || "No result";
 }
 
+function getAnalysisCategory(item) {
+    const resultType = item?.result?.type || item?.type || '';
+    if (resultType === 'readme_summary') {
+        return {
+            key: 'readme_summary',
+            label: 'README Summary',
+            badgeClass: 'status-processing'
+        };
+    }
+
+    if (resultType === 'error') {
+        return {
+            key: 'failed',
+            label: 'Failed',
+            badgeClass: 'status-failed'
+        };
+    }
+
+    return {
+        key: 'generate_readme',
+        label: 'Generate README',
+        badgeClass: 'status-completed'
+    };
+}
+
 // Load history
-async function loadHistory() {
+async function loadHistory(page = currentHistoryPage) {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${API_BASE}/analysis/history?limit=10`, {
+        const response = await fetch(`${API_BASE}/analysis/history?page=${page}&limit=5`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -363,22 +442,34 @@ async function loadHistory() {
 
         const data = await response.json();
         const historyList = document.getElementById('history-list');
+        const pagination = document.getElementById('history-pagination');
+        currentHistoryPage = data.page || page;
+        totalHistoryPages = data.pages || 1;
+
+        const stats = data.stats || {};
+        document.getElementById('total-count').textContent = data.total || 0;
+        document.getElementById('generate-count').textContent = stats.generate_readme || 0;
+        document.getElementById('summary-count').textContent = stats.readme_summary || 0;
+        document.getElementById('failed-count').textContent = stats.failed || 0;
 
         if (!data.analyses || data.analyses.length === 0) {
             historyList.innerHTML = '<p class="text-gray-400 text-sm text-center py-8">No analyses yet</p>';
+            pagination.classList.add('hidden');
             return;
         }
 
-        historyList.innerHTML = data.analyses.map((item) => `
+        historyList.innerHTML = data.analyses.map((item) => {
+            const category = getAnalysisCategory(item);
+            return `
             <div class="glass rounded-xl p-4">
                 <div class="flex items-start justify-between mb-2">
                     <div class="flex-1 min-w-0">
-                        <p class="font-medium truncate">Code Analysis</p>
+                        <p class="font-medium truncate">${category.label}</p>
                         <p class="text-xs text-gray-400">
                             ${new Date(item.created_at).toLocaleDateString()}
                         </p>
                     </div>
-                    <span class="status-badge status-completed">DONE</span>
+                    <span class="status-badge ${category.badgeClass}">${category.label.toUpperCase()}</span>
                 </div>
 
                 <button 
@@ -387,7 +478,8 @@ async function loadHistory() {
                     View Result
                 </button>
             </div>
-        `).join('');
+        `;
+        }).join('');
 
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -400,14 +492,36 @@ async function loadHistory() {
             });
         });
 
+        document.getElementById('history-page-label').textContent = `Page ${currentHistoryPage} of ${totalHistoryPages}`;
+        document.getElementById('history-prev').disabled = currentHistoryPage <= 1;
+        document.getElementById('history-next').disabled = currentHistoryPage >= totalHistoryPages;
+        document.getElementById('history-prev').classList.toggle('opacity-50', currentHistoryPage <= 1);
+        document.getElementById('history-next').classList.toggle('opacity-50', currentHistoryPage >= totalHistoryPages);
+        pagination.classList.toggle('hidden', totalHistoryPages <= 1);
+
     } catch (error) {
         console.error('Error loading history:', error);
     }
 }
 
+function changeHistoryPage(direction) {
+    const nextPage = currentHistoryPage + direction;
+    if (nextPage < 1 || nextPage > totalHistoryPages) return;
+    loadHistory(nextPage);
+}
+
 // Set GitHub URL
 function setGithubUrl(url) {
     document.getElementById('github-url').value = url;
+    document.getElementById('readme-github-url').value = url;
+}
+
+function toggleReadmeSummary() {
+    const card = document.getElementById('readme-summary-card');
+    const toggleBtn = document.getElementById('readme-toggle-btn');
+    const isHidden = card.classList.contains('hidden');
+    card.classList.toggle('hidden');
+    toggleBtn.textContent = isHidden ? 'Hide' : 'Open';
 }
 
 // Loading states
@@ -455,7 +569,7 @@ async function analyzeGithub() {
         document.getElementById('readme-modal').classList.add('flex');
 
         showToast('Analysis completed!', 'success');
-        loadHistory();
+        loadHistory(1);
 
     } catch (error) {
         showToast(error.message);
@@ -497,13 +611,47 @@ async function analyzeFile() {
         document.getElementById('readme-modal').classList.add('flex');
 
         showToast('Analysis completed!', 'success');
-        loadHistory();
+        loadHistory(1);
 
     } catch (error) {
         showToast(error.message);
     } finally {
         hideProgressModal();
         hideLoading('upload-btn', 'upload-spinner', 'upload-btn-text');
+    }
+}
+
+async function summarizeReadme() {
+    const url = document.getElementById('readme-github-url').value.trim();
+    if (!url) {
+        showToast('Please enter a GitHub URL');
+        return;
+    }
+
+    showLoading('readme-summary-btn', 'readme-summary-spinner', 'readme-summary-btn-text');
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE}/analysis/readme/intelligence`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ repo_url: url })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'README summary failed');
+
+        currentReadme = data.analysis || 'No result';
+        document.getElementById('readme-summary-content').textContent = currentReadme;
+        document.getElementById('readme-summary-result').classList.remove('hidden');
+        showToast('README summary completed!', 'success');
+    } catch (error) {
+        showToast(error.message);
+    } finally {
+        hideLoading('readme-summary-btn', 'readme-summary-spinner', 'readme-summary-btn-text');
     }
 }
 

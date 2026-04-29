@@ -209,6 +209,9 @@
                 <p class="text-gray-500 text-sm">
                     Demo: <span class="text-gray-300">demo@mail.com</span> / <span class="text-gray-300">password</span>
                 </p>
+                <p class="text-gray-500 text-sm mt-1">
+                    Admin: <span class="text-gray-300">admin@example.com</span> / <span class="text-gray-300">admin123</span>
+                </p>
             </div>
         </div>
     </div>
@@ -232,12 +235,40 @@
     
     <script>
         const API_BASE = 'http://127.0.0.1:8000/api';
+
+        function parseTokenPayload(token) {
+            try {
+                const payloadBase64 = token.split('.')[1];
+                if (!payloadBase64) return null;
+                const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+                const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+                return JSON.parse(atob(padded));
+            } catch (error) {
+                return null;
+            }
+        }
+
+        async function resolveRedirectPath(token) {
+            const payload = parseTokenPayload(token);
+            if (payload?.role === 'admin') return '/admin.html';
+            if (payload?.role === 'user') return '/dashboard.html';
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                return response.ok ? '/admin.html' : '/dashboard.html';
+            } catch (error) {
+                return '/dashboard.html';
+            }
+        }
         
         // Check if already logged in
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('token');
             if (token) {
-                window.location.href = '/dashboard.html';
+                const redirectPath = await resolveRedirectPath(token);
+                window.location.href = redirectPath;
             }
         });
         
@@ -320,8 +351,9 @@
                 localStorage.setItem('token', data.access_token);
                 showToast('Login successful!', 'success');
                 
-                setTimeout(() => {
-                    window.location.href = '/dashboard.html';
+                setTimeout(async () => {
+                    const redirectPath = await resolveRedirectPath(data.access_token);
+                    window.location.href = redirectPath;
                 }, 500);
             } catch (error) {
                 showToast(error.message);
@@ -372,8 +404,9 @@
                 
                 localStorage.setItem('token', loginData.access_token);
                 
-                setTimeout(() => {
-                    window.location.href = '/dashboard.html';
+                setTimeout(async () => {
+                    const redirectPath = await resolveRedirectPath(loginData.access_token);
+                    window.location.href = redirectPath;
                 }, 500);
             } catch (error) {
                 showToast(error.message);

@@ -248,6 +248,13 @@ This project is open source and available under the MIT License.
 
 For issues and questions, please open an issue on GitHub.
 
+## Recent Updates
+
+- History now uses pagination with 5 analyses per page.
+- A default admin account is created on startup: `admin@example.com` / `admin123`.
+- Admin users can open `/admin.html` to view the total user count and registered user details.
+- The dashboard includes a README Intelligence option that summarizes a GitHub repository README and suggests future improvements.
+
 ---
 
 Built with ❤️ using FastAPI, MongoDB, and Google Gemini AI

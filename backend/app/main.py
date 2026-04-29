@@ -3,7 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.routes import auth, analysis
+from app.routes import auth, analysis, admin
+from app.services.auth_service import ensure_default_admin
 from app.database.mongodb import client
 
 
@@ -47,6 +48,7 @@ app.add_middleware(
 # -------------------------------
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(analysis.router, prefix="/api/analysis", tags=["Analysis"])
+app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 
 
 # -------------------------------
@@ -54,6 +56,7 @@ app.include_router(analysis.router, prefix="/api/analysis", tags=["Analysis"])
 # -------------------------------
 @app.on_event("startup")
 async def startup():
+    await ensure_default_admin()
     print("🚀 Server started successfully")
     print("📁 Frontend path:", FRONTEND_DIR)
 

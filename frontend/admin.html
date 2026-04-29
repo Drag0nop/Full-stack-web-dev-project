@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Autonomous Codebase Documenter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow { box-shadow: 0 0 40px rgba(139, 92, 246, 0.3); }
+        .gradient-text {
+            background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .bg-grid {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+        }
+        .toast { animation: slideIn 0.3s ease-out; }
+        .email-link {
+            color: #d8b4fe;
+            transition: color 0.2s ease;
+        }
+        .email-link:hover { color: #f9a8d4; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-950 text-white">
+    <div class="fixed inset-0 bg-grid"></div>
+    <div class="orb w-96 h-96 bg-violet-600 -top-48 -left-48"></div>
+    <div class="orb w-96 h-96 bg-pink-600 -bottom-48 -right-48"></div>
+
+    <nav class="relative z-20 glass border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 glass rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0-1.105.895-2 2-2h5m0 0l-3-3m3 3l-3 3M5 5h7a2 2 0 012 2v3M5 19h7a2 2 0 002-2v-3"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">Admin</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="handleLogout()" class="px-4 py-2 glass rounded-lg hover:bg-white/10 text-sm text-red-300">Sign out</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid lg:grid-cols-4 gap-6 mb-6">
+            <div class="glass rounded-3xl p-6 glow">
+                <p id="user-count" class="text-4xl font-bold gradient-text">0</p>
+                <p class="text-gray-400 mt-1">Registered Users</p>
+            </div>
+        </div>
+
+        <div class="glass rounded-3xl p-6 glow">
+            <div class="flex items-center justify-between mb-5">
+                <h1 class="text-2xl font-semibold">User Details</h1>
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="user-search"
+                            oninput="renderUsers()"
+                            placeholder="Search by email, role, or user id"
+                            class="w-72 max-w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-violet-400"
+                        >
+                    </div>
+                    <button onclick="loadUsers()" class="px-4 py-2 glass rounded-lg hover:bg-white/10 text-sm">Refresh</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="text-sm text-gray-400 border-b border-gray-800">
+                        <tr>
+                            <th class="py-3 pr-4">Email</th>
+                            <th class="py-3 pr-4">Role</th>
+                            <th class="py-3 pr-4">User ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table" class="divide-y divide-gray-800">
+                        <tr>
+                            <td colspan="3" class="py-8 text-center text-gray-400">Loading users...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast" class="fixed top-4 right-4 z-50 hidden toast"></div>
+    <div id="analytics-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeAnalyticsModal()"></div>
+        <div class="relative w-full max-w-4xl glass rounded-3xl p-6 glow">
+            <div class="flex items-start justify-between gap-4 mb-6">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.3em] text-violet-300">Usage Analytics</p>
+                    <h2 id="analytics-email" class="text-2xl font-semibold mt-2">user@example.com</h2>
+                    <p id="analytics-subtitle" class="text-sm text-gray-400 mt-1">Frontend-only view of accessible usage data.</p>
+                </div>
+                <button onclick="closeAnalyticsModal()" class="px-3 py-2 glass rounded-lg hover:bg-white/10 text-sm">Close</button>
+            </div>
+            <div class="grid lg:grid-cols-[1.4fr_0.8fr] gap-6">
+                <div class="glass rounded-2xl p-4 min-h-[360px]">
+                    <div id="analytics-chart" class="w-full h-[320px]"></div>
+                </div>
+                <div class="glass rounded-2xl p-5">
+                    <h3 class="text-lg font-semibold mb-4">Tracked Actions</h3>
+                    <div class="space-y-4">
+                        <div class="glass rounded-xl p-4">
+                            <p class="text-sm text-gray-400">Total Actions</p>
+                            <p id="analytics-total-count" class="text-3xl font-bold gradient-text mt-2">0</p>
+                        </div>
+                        <div class="glass rounded-xl p-4">
+                            <p class="text-sm text-gray-400">Generate README</p>
+                            <p id="analytics-generate-count" class="text-3xl font-bold text-violet-300 mt-2">0</p>
+                        </div>
+                        <div class="glass rounded-xl p-4">
+                            <p class="text-sm text-gray-400">README Summary</p>
+                            <p id="analytics-summary-count" class="text-3xl font-bold text-pink-300 mt-2">0</p>
+                        </div>
+                    </div>
+                    <p id="analytics-note" class="text-xs text-gray-400 mt-5 leading-6">
+                        This popup can only visualize usage data exposed by the current frontend-accessible payload.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000/api';
+        let allUsers = [];
+        let analyticsRenderer = null;
+        let analyticsScene = null;
+        let analyticsCamera = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/index.html';
+                return;
+            }
+            loadUsers();
+        });
+
+        async function loadUsers() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/admin/users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || 'Admin access required');
+
+                allUsers = Array.isArray(data.users) ? data.users : [];
+                document.getElementById('user-count').textContent = allUsers.length;
+                renderUsers();
+            } catch (error) {
+                showToast(error.message);
+                if (error.message.toLowerCase().includes('admin')) {
+                    setTimeout(() => window.location.href = '/dashboard.html', 1200);
+                }
+            }
+        }
+
+        function renderUsers() {
+            const table = document.getElementById('users-table');
+            const query = document.getElementById('user-search').value.trim().toLowerCase();
+            const filteredUsers = allUsers.filter((user) => {
+                const haystack = `${user.email || ''} ${user.role || ''} ${user._id || ''}`.toLowerCase();
+                return !query || haystack.includes(query);
+            });
+
+            if (filteredUsers.length === 0) {
+                table.innerHTML = '<tr><td colspan="3" class="py-8 text-center text-gray-400">No matching users found</td></tr>';
+                return;
+            }
+
+            table.innerHTML = filteredUsers.map((user, index) => `
+                <tr>
+                    <td class="py-4 pr-4 font-medium">
+                        <button type="button" class="email-link text-left" onclick="openAnalyticsModal(${index})">
+                            ${escapeHtml(user.email || '')}
+                        </button>
+                    </td>
+                    <td class="py-4 pr-4">
+                        <span class="px-3 py-1 rounded-full text-xs ${user.role === 'admin' ? 'bg-violet-500/20 text-violet-300' : 'bg-gray-500/20 text-gray-300'}">
+                            ${escapeHtml(user.role || 'user')}
+                        </span>
+                    </td>
+                    <td class="py-4 pr-4 text-sm text-gray-400">${escapeHtml(user._id || '')}</td>
+                </tr>
+            `).join('');
+
+            window.filteredUsersCache = filteredUsers;
+        }
+
+        function extractUsageStats(user) {
+            const stats = user.usageStats || user.analysisStats || user.stats || {};
+            const generateReadme = Number(
+                stats.generate_readme ??
+                stats.generateReadme ??
+                stats.github_generate ??
+                stats.githubGenerate ??
+                0
+            );
+            const readmeSummary = Number(
+                stats.readme_summary ??
+                stats.readmeSummary ??
+                stats.github_summary ??
+                stats.githubSummary ??
+                0
+            );
+
+            return {
+                generateReadme: Number.isFinite(generateReadme) ? generateReadme : 0,
+                readmeSummary: Number.isFinite(readmeSummary) ? readmeSummary : 0,
+            };
+        }
+
+        function openAnalyticsModal(index) {
+            const user = (window.filteredUsersCache || [])[index];
+            if (!user) return;
+
+            const stats = extractUsageStats(user);
+            const hasRealStats = Boolean(user.usageStats || user.analysisStats || user.stats);
+            document.getElementById('analytics-email').textContent = user.email || 'Unknown user';
+            document.getElementById('analytics-total-count').textContent = Number(user.usageStats?.total || (stats.generateReadme + stats.readmeSummary));
+            document.getElementById('analytics-generate-count').textContent = stats.generateReadme;
+            document.getElementById('analytics-summary-count').textContent = stats.readmeSummary;
+            document.getElementById('analytics-note').textContent = hasRealStats
+                ? 'Visualizing usage data available in the current admin payload.'
+                : 'No per-user usage counts are exposed by the current frontend-only admin payload yet, so this view shows zeroes until those stats are provided.';
+            document.getElementById('analytics-modal').classList.remove('hidden');
+            document.getElementById('analytics-modal').classList.add('flex');
+            requestAnimationFrame(() => renderAnalyticsChart(stats));
+        }
+
+        function closeAnalyticsModal() {
+            document.getElementById('analytics-modal').classList.add('hidden');
+            document.getElementById('analytics-modal').classList.remove('flex');
+            if (analyticsRenderer) {
+                analyticsRenderer.dispose();
+                analyticsRenderer.domElement.remove();
+                analyticsRenderer = null;
+                analyticsScene = null;
+                analyticsCamera = null;
+            }
+        }
+
+        function renderAnalyticsChart(stats) {
+            const container = document.getElementById('analytics-chart');
+            if (!container || !window.THREE) return;
+
+            if (analyticsRenderer) {
+                analyticsRenderer.dispose();
+                analyticsRenderer.domElement.remove();
+            }
+
+            const width = container.clientWidth || 640;
+            const height = container.clientHeight || 320;
+            analyticsScene = new THREE.Scene();
+            analyticsScene.background = new THREE.Color(0x10111a);
+
+            analyticsCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            analyticsCamera.position.set(0, 4.5, 12);
+            analyticsCamera.lookAt(0, 1.6, 0);
+
+            analyticsRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            analyticsRenderer.setSize(width, height);
+            container.appendChild(analyticsRenderer.domElement);
+
+            const ambient = new THREE.AmbientLight(0xffffff, 1.1);
+            const directional = new THREE.DirectionalLight(0xffffff, 1.6);
+            directional.position.set(6, 10, 8);
+            analyticsScene.add(ambient, directional);
+
+            const floor = new THREE.Mesh(
+                new THREE.PlaneGeometry(12, 6),
+                new THREE.MeshStandardMaterial({ color: 0x181926, roughness: 0.8, metalness: 0.1 })
+            );
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.y = -0.01;
+            analyticsScene.add(floor);
+
+            const bars = [
+                {
+                    label: 'Generate README',
+                    value: stats.generateReadme,
+                    color: 0xa78bfa,
+                    x: -2.2
+                },
+                {
+                    label: 'README Summary',
+                    value: stats.readmeSummary,
+                    color: 0xf472b6,
+                    x: 2.2
+                }
+            ];
+
+            const maxValue = Math.max(1, ...bars.map((bar) => bar.value));
+            bars.forEach((bar) => {
+                const barHeight = 0.6 + (bar.value / maxValue) * 4.2;
+                const mesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(1.8, barHeight, 1.8),
+                    new THREE.MeshStandardMaterial({ color: bar.color, roughness: 0.35, metalness: 0.25 })
+                );
+                mesh.position.set(bar.x, barHeight / 2, 0);
+                analyticsScene.add(mesh);
+            });
+
+            analyticsRenderer.render(analyticsScene, analyticsCamera);
+        }
+
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `fixed top-4 right-4 z-50 toast px-6 py-4 rounded-xl ${
+                type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            }`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 4000);
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/index.html';
+        }
+    </script>
+</body>
+</html>
